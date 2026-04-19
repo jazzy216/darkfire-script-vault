@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dark Fire Security — Script Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:       #0a0c0f;
+    --bg2:      #0f1318;
+    --bg3:      #141920;
+    --surface:  #1a2030;
+    --border:   #1e2d40;
+    --border2:  #2a3f5a;
+    --fire:     #ff4e00;
+    --fire2:    #ff8c00;
+    --ember:    #ff2d00;
+    --cyan:     #00d4ff;
+    --cyan2:    #0099bb;
+    --green:    #00ff88;
+    --green2:   #00c466;
+    --amber:    #ffb300;
+    --red:      #ff3b3b;
+    --text:     #c8d8e8;
+    --text2:    #7a9ab8;
+    --text3:    #4a6a88;
+    --mono:     'Share Tech Mono', monospace;
+    --sans:     'Barlow', sans-serif;
+    --display:  'Barlow Condensed', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,12,15,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    padding: 0 2rem;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    position: relative;
+  }
+
+  .logo-text {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .logo-text span { color: var(--fire); }
+
+  .logo-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.15em;
+    margin-left: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .stat-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  .stat-pill span { color: var(--fire2); }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 3rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,78,0,0.04) 0%, transparent 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: 'SCRIPT VAULT';
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 7rem;
+    color: rgba(255,78,0,0.04);
+    letter-spacing: -0.02em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 2.8rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero h1 em {
+    color: var(--fire);
+    font-style: normal;
+    position: relative;
+  }
+
+  .hero p {
+    color: var(--text2);
+    font-size: 13px;
+    max-width: 500px;
+    font-family: var(--mono);
+  }
+
+  /* ─── CONTROLS ─── */
+  .controls {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--bg2);
+    position: sticky;
+    top: 58px;
+    z-index: 99;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 7px 12px 7px 32px;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--fire); }
+  .search-wrap input::placeholder { color: var(--text3); }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 12px;
+    font-family: var(--mono);
+    pointer-events: none;
+  }
+
+  .filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .fbtn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .fbtn:hover { border-color: var(--border2); color: var(--text2); }
+  .fbtn.active { background: var(--fire); border-color: var(--fire); color: #fff; }
+  .fbtn.f-linux.active  { background: var(--green2); border-color: var(--green2); }
+  .fbtn.f-windows.active { background: var(--cyan2); border-color: var(--cyan2); }
+  .fbtn.f-ps.active     { background: #5b6abf; border-color: #5b6abf; }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: calc(100vh - 58px - 60px - 80px);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    height: calc(100vh - 58px - 60px);
+    position: sticky;
+    top: 118px;
+  }
+
+  .cat-section { border-bottom: 1px solid var(--border); }
+
+  .cat-header {
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .script-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(30,45,64,0.5);
+    transition: background 0.12s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .script-item:hover { background: var(--bg3); }
+  .script-item.active { background: rgba(255,78,0,0.08); border-left: 2px solid var(--fire); padding-left: 14px; }
+
+  .item-os {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 2px 5px;
+    border-radius: 2px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .os-bash    { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.2); }
+  .os-batch   { background: rgba(0,212,255,0.1); color: var(--cyan);  border: 1px solid rgba(0,212,255,0.2); }
+  .os-ps      { background: rgba(91,106,191,0.15); color: #8fa0f0; border: 1px solid rgba(91,106,191,0.3); }
+  .os-both    { background: rgba(255,78,0,0.1); color: var(--fire2); border: 1px solid rgba(255,78,0,0.2); }
+
+  .item-info { flex: 1; min-width: 0; }
+  .item-title { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-desc  { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+
+  /* ─── MAIN PANEL ─── */
+  .main-panel {
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    color: var(--text3);
+    gap: 12px;
+  }
+
+  .empty-state .big { font-family: var(--display); font-size: 4rem; font-weight: 900; color: rgba(255,78,0,0.08); }
+  .empty-state p { font-family: var(--mono); font-size: 12px; }
+
+  .detail-wrap { padding: 2rem; }
+
+  .detail-head {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .detail-title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .detail-desc {
+    color: var(--text2);
+    font-size: 13px;
+    margin-top: 8px;
+    max-width: 540px;
+    line-height: 1.6;
+  }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 8px 18px;
+    border: 1px solid var(--fire);
+    color: var(--fire);
+    background: transparent;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    white-space: nowrap;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .copy-btn:hover { background: var(--fire); color: #fff; }
+  .copy-btn.ok { background: var(--green2); border-color: var(--green2); color: #fff; }
+
+  /* Code block */
+  .code-wrap {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .code-topbar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .code-dots { display: flex; gap: 5px; }
+  .code-dots span { width: 8px; height: 8px; border-radius: 50%; }
+  .d1 { background: var(--red); }
+  .d2 { background: var(--amber); }
+  .d3 { background: var(--green); }
+
+  pre {
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre;
+  }
+
+  .c-comment  { color: #3d5a7a; }
+  .c-keyword  { color: #ff8c42; }
+  .c-string   { color: #a8d88a; }
+  .c-var      { color: var(--cyan); }
+  .c-cmd      { color: var(--fire2); }
+  .c-num      { color: var(--amber); }
+  .c-flag     { color: #c792ea; }
+
+  /* Teach section */
+  .teach-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--fire);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .teach-grid { display: flex; flex-direction: column; gap: 8px; }
+
+  .teach-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--border2);
+    border-radius: 2px;
+  }
+
+  .teach-item:hover { border-left-color: var(--fire2); }
+
+  .teach-code {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cyan);
+    background: var(--bg3);
+    padding: 2px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .teach-exp {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* Use case */
+  .usecase-bar {
+    background: rgba(255,78,0,0.05);
+    border: 1px solid rgba(255,78,0,0.15);
+    border-radius: 2px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .usecase-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--fire);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .usecase-text { font-size: 12px; color: var(--text2); }
+
+  /* Save tip */
+  .save-tip {
+    background: rgba(0,255,136,0.03);
+    border: 1px solid rgba(0,255,136,0.1);
+    border-radius: 2px;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 1.5rem;
+  }
+
+  .save-tip span { color: var(--green); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 12px 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  footer span { color: var(--fire2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--fire); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .detail-wrap { animation: fadeIn 0.2s ease; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { height: auto; position: static; }
+    .hero::after { display: none; }
+    .hero h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 28 28" fill="none">
+      <polygon points="14,2 4,24 14,20 24,24" fill="#ff4e00" opacity="0.9"/>
+      <polygon points="14,8 8,24 14,20 20,24" fill="#ff8c00" opacity="0.7"/>
+    </svg>
+    <div>
+      <div class="logo-text">Dark<span>Fire</span> Security</div>
+      <div class="logo-sub">Script Vault // v1.0</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="stat-pill">Scripts: <span id="total-count">0</span></div>
+    <div class="stat-pill">Visible: <span id="visible-count">0</span></div>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Operator<br/><em>Script Vault</em></h1>
+  <p>// bash · batch · powershell — learn every line, copy any script</p>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">&gt;_</span>
+    <input type="text" id="search" placeholder="search scripts..." oninput="renderSidebar()" />
+  </div>
+  <div class="filters">
+    <button class="fbtn active" onclick="setFilter('all',this)">All</button>
+    <button class="fbtn f-linux" onclick="setFilter('bash',this)">Bash</button>
+    <button class="fbtn f-windows" onclick="setFilter('batch',this)">Batch</button>
+    <button class="fbtn f-ps" onclick="setFilter('ps',this)">PowerShell</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main-panel" id="main">
+    <div class="empty-state">
+      <div class="big">DFS</div>
+      <p>// select a script to view code + breakdown</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>Dark Fire Security &mdash; Script Vault &mdash; Personal Use Only</div>
+  <div>Jazzy &mdash; <span>VUMC Field Tech → Cybersecurity</span></div>
+</footer>
+
+<script>
+const SCRIPTS = [
+
+  // ─── PRIVACY & KILLSWITCH ───────────────────────────────────────────
+  {
+    id:'ks1', cat:'Privacy & Kill Switch', os:'batch',
+    title:'Privacy Kill Switch',
+    desc:'Lock, clear clipboard, flush DNS, kill all browsers instantly.',
+    usecase:'Walk away from any Windows machine without leaving traces. Bind to a hotkey with AutoHotkey for one-button OPSEC.',
+    saveas:'kill_switch.bat',
+    code:
+"@echo off\n:: Lock the workstation immediately\nrundll32.exe user32.dll,LockWorkStation\n\n:: Clear clipboard contents\necho off | clip\n\n:: Flush DNS resolver cache (removes browsing evidence)\nipconfig /flushdns\n\n:: Force-kill common browsers (errors silently suppressed)\ntaskkill /f /im \"chrome.exe\"  >nul 2>&1\ntaskkill /f /im \"firefox.exe\" >nul 2>&1\ntaskkill /f /im \"brave.exe\"   >nul 2>&1\ntaskkill /f /im \"msedge.exe\"  >nul 2>&1\ntaskkill /f /im \"opera.exe\"   >nul 2>&1\n\n:: Kill ALL non-cmd processes (nuclear option)\nfor /f \"tokens=1\" %%a in (\n  'tasklist /fi \"imagename ne cmd.exe\" /fo csv /nh'\n) do (\n  taskkill /f /im \"%%~a\" >nul 2>&1\n)",
+    teach:[
+      ['@echo off','Suppresses command echo — terminal stays clean. Always the first line in .bat files.'],
+      ['rundll32.exe user32.dll,LockWorkStation','Calls the Windows Lock function directly from the Win32 DLL. Same as pressing Win+L — no external tools needed.'],
+      ['echo off | clip','Pipes an empty string into the clipboard, effectively clearing it. The "off" text becomes the clipboard content, replacing anything sensitive.'],
+      ['ipconfig /flushdns','Clears the OS-level DNS resolver cache. This removes a log of which domains were recently visited.'],
+      ['taskkill /f /im "chrome.exe" >nul 2>&1','/f = force kill (no graceful shutdown). /im = image name (process filename). >nul 2>&1 redirects both stdout and stderr to null — no error if process isn\'t running.'],
+      ['for /f "tokens=1" %%a in (...)','CMD for loop over output. /f parses text. tokens=1 grabs first field. %%a is the loop variable (single % in interactive CMD).'],
+      ['\'tasklist /fi "imagename ne cmd.exe" /fo csv /nh\'','Lists all processes except cmd.exe. /fi = filter. /fo csv = CSV output for easy parsing. /nh = no header row.'],
+    ]
+  },
+  {
+    id:'ks2', cat:'Privacy & Kill Switch', os:'bash',
+    title:'Linux Privacy Wipe',
+    desc:'Clear bash history, flush DNS, kill browsers, wipe RAM-cached data.',
+    usecase:'Emergency privacy sweep on Linux workstations or your home lab before stepping away.',
+    saveas:'privacy_wipe.sh',
+    code:
+"#!/bin/bash\n# Emergency privacy sweep for Linux\n\necho \"[*] Clearing bash history...\"\nhistory -c && history -w\ncat /dev/null > ~/.bash_history\nunset HISTFILE\n\necho \"[*] Killing browsers...\"\nfor PROC in firefox chrome chromium brave opera; do\n  pkill -9 \"$PROC\" 2>/dev/null && echo \"    Killed: $PROC\"\ndone\n\necho \"[*] Flushing DNS cache...\"\n# systemd-resolved (Ubuntu 18.04+)\nsystemd-resolve --flush-caches 2>/dev/null\n# nscd fallback\nservice nscd restart 2>/dev/null\n# dnsmasq fallback\npkill -HUP dnsmasq 2>/dev/null\n\necho \"[*] Clearing clipboard (requires xclip)...\"\nxclip -selection clipboard < /dev/null 2>/dev/null\nxclip -selection primary   < /dev/null 2>/dev/null\n\necho \"[*] Clearing recently used files list...\"\ncat /dev/null > ~/.local/share/recently-used.xbel 2>/dev/null\n\necho \"[+] Privacy sweep complete.\"",
+    teach:[
+      ['history -c && history -w','-c clears the in-memory history. -w writes (empty) history to disk. && means "only run next command if previous succeeded."'],
+      ['cat /dev/null > ~/.bash_history','Redirects /dev/null (empty) into .bash_history, truncating it to 0 bytes. Belt-and-suspenders with history -w.'],
+      ['unset HISTFILE','Removes the HISTFILE variable so bash won\'t write a new history file when this session ends.'],
+      ['for PROC in firefox chrome chromium','Bash for loop over a space-separated word list. Each iteration sets $PROC to the next word.'],
+      ['pkill -9 "$PROC"','pkill kills by process name. -9 = SIGKILL (immediate, unblockable termination). 2>/dev/null suppresses "no process found" errors.'],
+      ['systemd-resolve --flush-caches','Clears the systemd-resolved DNS cache. Required on Ubuntu 18.04+. Each Linux distro may use a different DNS caching daemon.'],
+      ['xclip -selection clipboard < /dev/null','Feeds empty input into xclip to clear the X11 clipboard. Two selections exist: clipboard (Ctrl+C) and primary (mouse select).'],
+    ]
+  },
+
+  // ─── NETWORK RECON / OSINT ─────────────────────────────────────────
+  {
+    id:'net1', cat:'Network Recon / OSINT', os:'bash',
+    title:'Ping Sweep (Host Discovery)',
+    desc:'Discover all live hosts on a /24 subnet using parallel pings.',
+    usecase:'First-pass recon of a network segment — home lab, client pre-engagement, or unknown VLAN during field work.',
+    saveas:'ping_sweep.sh',
+    code:
+"#!/bin/bash\n# Usage: ./ping_sweep.sh 192.168.1\nSUBNET=${1:-\"192.168.1\"}\nOUT=\"sweep_$(date +%Y%m%d_%H%M%S).txt\"\n\necho \"[*] Sweeping ${SUBNET}.0/24...\"\necho \"Sweep: ${SUBNET}.0/24 — $(date)\" > \"$OUT\"\necho \"---\" >> \"$OUT\"\n\nfor HOST in $(seq 1 254); do\n  # Run each ping in background (&) for parallelism\n  ping -c 1 -W 1 \"${SUBNET}.${HOST}\" >/dev/null 2>&1 && {\n    echo \"  [UP] ${SUBNET}.${HOST}\"\n    echo \"${SUBNET}.${HOST}\" >> \"$OUT\"\n  } &\ndone\n\nwait  # Block until all background pings finish\necho \"[+] Done. $(wc -l < \"$OUT\") hosts up. Saved: $OUT\"\n\n# Sort results by last octet numerically\nsort -t. -k4 -n \"$OUT\"",
+    teach:[
+      ['SUBNET=${1:-"192.168.1"}','${1} = first argument. :-"..." = default value if no arg passed. Run as: ./ping_sweep.sh 10.0.0'],
+      ['for HOST in $(seq 1 254)','$(seq 1 254) generates numbers 1–254. $() is command substitution — output replaces the expression inline.'],
+      ['ping -c 1 -W 1','-c 1 = send exactly 1 ICMP packet. -W 1 = wait max 1 second for reply. Fast and non-intrusive.'],
+      ['>/dev/null 2>&1','Redirects stdout to /dev/null (discard). 2>&1 redirects stderr to wherever stdout goes (also discarded). Silences all ping output.'],
+      ['&','Runs the preceding command in a background subshell. Without this, 254 sequential pings takes ~4 min. With it: ~2 seconds.'],
+      ['wait','Waits for ALL background jobs to complete before continuing. Essential after backgrounding a loop — otherwise the script exits immediately.'],
+      ['sort -t. -k4 -n','Sort by the 4th field (-k4) using dot as delimiter (-t.). -n = numeric sort. Sorts IPs by last octet: .1, .2, ... .254.'],
+    ]
+  },
+  {
+    id:'net2', cat:'Network Recon / OSINT', os:'bash',
+    title:'TCP Port Scanner (No Nmap)',
+    desc:'Scan a host for open TCP ports using pure bash /dev/tcp.',
+    usecase:'Recon when nmap isn\'t available. Works on any bash system — Dark Fire Security pre-engagement toolkit staple.',
+    saveas:'port_scan.sh',
+    code:
+"#!/bin/bash\n# Usage: ./port_scan.sh <host> [start_port] [end_port]\nHOST=${1:-\"localhost\"}\nSTART=${2:-1}\nEND=${3:-1024}\nTIMEOUT=1\n\necho \"[*] Scanning $HOST ports $START-$END...\"\nOPEN=0\n\nfor PORT in $(seq $START $END); do\n  # /dev/tcp is a bash virtual device — no netcat needed\n  (echo >/dev/tcp/$HOST/$PORT) 2>/dev/null && {\n    echo \"  [OPEN] $PORT/tcp\"\n    ((OPEN++))\n  }\ndone\n\necho \"[+] Scan complete. $OPEN open ports found.\"",
+    teach:[
+      ['/dev/tcp/$HOST/$PORT','Bash\'s built-in virtual TCP device. Writing to it attempts a TCP connection. If the port is open, the write succeeds. This is pure bash — no nmap, nc, or other tools needed.'],
+      ['(echo > /dev/tcp/...)','Runs in a subshell () so a failed connection doesn\'t kill the script. echo writes to the device; success = port open.'],
+      ['2>/dev/null','Discards the "connection refused" or "timeout" error messages that appear on failed attempts.'],
+      ['&&','Logical AND operator. The right side only executes if the left side succeeded (exit code 0). So the echo only runs for open ports.'],
+      ['((OPEN++))','Double-parens arithmetic. Increments OPEN by 1. Bash arithmetic syntax — NOT the same as $((expr)).'],
+    ]
+  },
+  {
+    id:'net3', cat:'Network Recon / OSINT', os:'bash',
+    title:'Live Connection Monitor',
+    desc:'Real-time view of all active TCP connections, refreshed every 2s.',
+    usecase:'SOC-style monitoring of your own machine. Spot unexpected outbound connections — malware C2, unauthorized services.',
+    saveas:'conn_monitor.sh',
+    code:
+"#!/bin/bash\n# Requires: ss (iproute2 — standard on modern Linux)\n# Press Ctrl+C to exit\n\nINTERVAL=${1:-2}\n\nwatch -n $INTERVAL --color '\n  echo \"=== ACTIVE TCP CONNECTIONS === $(date +%T)\"\n  echo \"\"\n  printf \"%-12s %-25s %-25s %-20s\\n\" \"STATE\" \"LOCAL\" \"REMOTE\" \"PROCESS\"\n  echo \"----------------------------------------------------------------------\"\n  ss -tnp 2>/dev/null | tail -n +2 | \\\n  awk \"{printf \\\"%-12s %-25s %-25s %-20s\\n\\\", \\$1, \\$4, \\$5, \\$6}\" | \\\n  sort -k1\n  echo \"\"\n  echo \"LISTENING PORTS:\"\n  ss -tlnp 2>/dev/null | tail -n +2 | awk \"{print \\\"  \\\"\\$4, \\$6}\"\n'",
+    teach:[
+      ['watch -n 2 --color','Re-runs the quoted command every N seconds, clearing and redrawing the screen each time. --color preserves ANSI color codes. The Linux real-time monitoring tool.'],
+      ['ss -tnp','Socket Statistics — the modern netstat. -t = TCP only. -n = numeric (skip DNS resolution, faster). -p = show owning process name and PID.'],
+      ['tail -n +2','Skips the first N-1 lines. +2 means "start output at line 2" — removes the header row from ss output.'],
+      ['awk "{printf ...}"','awk processes each line as fields ($1, $2...). printf formats output into fixed-width columns for alignment.'],
+      ['ss -tlnp','-l = listening sockets only. Shows what services are accepting connections — your exposed attack surface.'],
+    ]
+  },
+  {
+    id:'net4', cat:'Network Recon / OSINT', os:'bash',
+    title:'Subdomain Enumerator',
+    desc:'Brute-force DNS subdomains from a wordlist using dig.',
+    usecase:'Dark Fire Security pre-engagement OSINT. Enumerate client attack surface before a pentest.',
+    saveas:'subdomain_enum.sh',
+    code:
+"#!/bin/bash\n# Usage: ./subdomain_enum.sh <domain> [wordlist]\nDOMAIN=${1:-\"example.com\"}\nWORDLIST=${2:-\"/usr/share/wordlists/subdomains-top1million-5000.txt\"}\nOUT=\"subdomains_${DOMAIN}_$(date +%Y%m%d).txt\"\nFOUND=0\n\nif [ ! -f \"$WORDLIST\" ]; then\n  echo \"[-] Wordlist not found: $WORDLIST\"\n  echo \"    Try: apt install seclists\"\n  exit 1\nfi\n\necho \"[*] Enumerating subdomains of $DOMAIN...\"\necho \"[*] Wordlist: $WORDLIST\"\n\nwhile IFS= read -r SUB; do\n  FQDN=\"${SUB}.${DOMAIN}\"\n  RESULT=$(dig +short \"$FQDN\" A 2>/dev/null)\n  if [ -n \"$RESULT\" ]; then\n    echo \"  [FOUND] $FQDN -> $RESULT\"\n    echo \"$FQDN $RESULT\" >> \"$OUT\"\n    ((FOUND++))\n  fi\ndone < \"$WORDLIST\"\n\necho \"[+] Found $FOUND subdomains. Saved: $OUT\"",
+    teach:[
+      ['while IFS= read -r SUB; do','Reads the wordlist line by line into $SUB. IFS= preserves leading whitespace. -r prevents backslash interpretation. < "$WORDLIST" feeds the file into the loop.'],
+      ['FQDN="${SUB}.${DOMAIN}"','String concatenation. ${VAR} = variable expansion. FQDN = Fully Qualified Domain Name (e.g., "mail.example.com").'],
+      ['dig +short "$FQDN" A','dig queries DNS. +short = concise output (IP only). A = A record type (IPv4 address). Outputs nothing if the subdomain doesn\'t exist.'],
+      ['if [ -n "$RESULT" ]','-n = "string is non-empty." Checks if dig returned an IP address. Only prints/saves found subdomains.'],
+      ['done < "$WORDLIST"','Process redirection. Feeds the wordlist file into the while loop as stdin. More efficient than piping cat.'],
+    ]
+  },
+  {
+    id:'net5', cat:'Network Recon / OSINT', os:'bash',
+    title:'WHOIS + GeoIP Lookup',
+    desc:'Full IP intelligence: WHOIS, geolocation, ASN, and reverse DNS.',
+    usecase:'Investigate suspicious IPs from logs or connection monitors. Dark Fire Security threat intel workflow.',
+    saveas:'ip_intel.sh',
+    code:
+"#!/bin/bash\n# Usage: ./ip_intel.sh <IP or domain>\nTARGET=${1:-\"8.8.8.8\"}\n\necho \"╔══════════════════════════════════════╗\"\necho \"║  IP INTELLIGENCE: $TARGET\"\necho \"╚══════════════════════════════════════╝\"\n\necho \"\"\necho \"[ REVERSE DNS ]\"\ndig +short -x \"$TARGET\" 2>/dev/null || echo \"  No PTR record\"\n\necho \"\"\necho \"[ WHOIS ]\"\nwhois \"$TARGET\" 2>/dev/null | grep -iE \\\n  \"^(OrgName|org-name|descr|country|netname|CIDR|route|abuse)\" | head -10\n\necho \"\"\necho \"[ GeoIP — ipinfo.io ]\"\ncurl -s \"https://ipinfo.io/${TARGET}/json\" 2>/dev/null | \\\n  python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nfor k in ['ip','hostname','city','region','country','org','timezone']:\n  print(f'  {k:12}: {d.get(k,\\\"N/A\\\")}')\n\" 2>/dev/null || echo \"  curl/python3 not available\"\n\necho \"\"\necho \"[ OPEN PORTS — common ]\"\nfor P in 21 22 23 25 53 80 443 3389 8080 8443; do\n  (echo >/dev/tcp/$TARGET/$P) 2>/dev/null && echo \"  [OPEN] $P\" &\ndone\nwait",
+    teach:[
+      ['dig +short -x "$TARGET"','-x = reverse lookup. Queries the PTR record for an IP to find its hostname. Useful for identifying services.'],
+      ['whois "$TARGET" | grep -iE "^(OrgName|...)"','WHOIS returns a lot of noise. grep -iE with pipe filters to only the lines we care about. -i = case-insensitive. -E = extended regex with alternation (|).'],
+      ['curl -s "https://ipinfo.io/..."','-s = silent mode (no progress bar). Fetches JSON from ipinfo.io — a free IP intelligence API.'],
+      ['python3 -c "..."','-c runs Python code inline. Parses the JSON from curl and pretty-prints the fields we want. No temp file needed.'],
+      ['for P in 21 22 23 25 53 80 443','Checks common ports (FTP, SSH, Telnet, SMTP, DNS, HTTP, HTTPS, RDP, alt-HTTP). Each check runs in background (&).'],
+    ]
+  },
+
+  // ─── INCIDENT RESPONSE / FORENSICS ────────────────────────────────
+  {
+    id:'ir1', cat:'Incident Response / Forensics', os:'bash',
+    title:'Live Triage Script',
+    desc:'Snapshot memory, connections, processes, users, and crons on a live Linux system.',
+    usecase:'First responder script — run immediately on a suspected compromised Linux host before pulling the drive.',
+    saveas:'live_triage.sh',
+    code:
+"#!/bin/bash\n# LIVE TRIAGE — run as root on suspected compromised host\n# Outputs to timestamped directory\n\nOUTDIR=\"triage_$(hostname)_$(date +%Y%m%d_%H%M%S)\"\nmkdir -p \"$OUTDIR\"\nLOG=\"$OUTDIR/triage.log\"\n\nlog() { echo \"$1\" | tee -a \"$LOG\"; }\n\nlog \"=== LIVE TRIAGE START: $(date) ===\"\nlog \"Host: $(hostname) | Kernel: $(uname -r)\"\n\nlog \"\\n[1] RUNNING PROCESSES\"\nps auxf > \"$OUTDIR/processes.txt\" && log \"  -> processes.txt\"\n\nlog \"\\n[2] NETWORK CONNECTIONS\"\nss -tnpa > \"$OUTDIR/connections.txt\" && log \"  -> connections.txt\"\nnetstat -rn > \"$OUTDIR/routes.txt\" && log \"  -> routes.txt\"\n\nlog \"\\n[3] LOGGED-IN USERS\"\nwho > \"$OUTDIR/who.txt\"\nlast -n 20 > \"$OUTDIR/last_logins.txt\" && log \"  -> last_logins.txt\"\n\nlog \"\\n[4] CRON JOBS (all users)\"\nfor U in $(cut -d: -f1 /etc/passwd); do\n  CRON=$(crontab -u \"$U\" -l 2>/dev/null)\n  if [ -n \"$CRON\" ]; then\n    echo \"=== $U ===\" >> \"$OUTDIR/crons.txt\"\n    echo \"$CRON\" >> \"$OUTDIR/crons.txt\"\n  fi\ndone\nlog \"  -> crons.txt\"\n\nlog \"\\n[5] SUID/SGID BINARIES (potential privesc)\"\nfind / -type f \\( -perm -4000 -o -perm -2000 \\) 2>/dev/null \\\n  > \"$OUTDIR/suid_binaries.txt\" && log \"  -> suid_binaries.txt\"\n\nlog \"\\n[6] RECENTLY MODIFIED FILES (24h)\"\nfind /etc /bin /usr/bin /tmp /var -mtime -1 -type f 2>/dev/null \\\n  > \"$OUTDIR/recent_files.txt\" && log \"  -> recent_files.txt\"\n\nlog \"\\n[7] LISTENING SERVICES\"\nss -tlnp > \"$OUTDIR/listening.txt\" && log \"  -> listening.txt\"\n\nlog \"\\n[8] ENVIRONMENT & PATH\"\nenv > \"$OUTDIR/environment.txt\" && log \"  -> environment.txt\"\n\nlog \"\\n=== TRIAGE COMPLETE: $(date) ===\"\nlog \"Output directory: $OUTDIR/\"\necho \"\"\nls -lh \"$OUTDIR/\"",
+    teach:[
+      ['log() { echo "$1" | tee -a "$LOG"; }','Defines a shell function. tee writes to both stdout AND the log file simultaneously. -a = append. This lets us see output AND save it.'],
+      ['ps auxf','a = all processes. u = user-oriented format. x = include processes without a terminal. f = forest (shows parent-child tree). The most complete process view.'],
+      ['ss -tnpa','-a = all sockets (including listening). Combined with -t, -n, -p gives full TCP socket picture including server sockets.'],
+      ['cut -d: -f1 /etc/passwd','-d: = colon delimiter. -f1 = first field. Extracts just the usernames from /etc/passwd. Used to loop over all users for cron check.'],
+      ['find / -perm -4000 -o -perm -2000','find with permission filter. -4000 = SUID bit set. -2000 = SGID bit set. These files run with elevated privileges — common privesc targets. -o = OR operator.'],
+      ['find /etc /bin -mtime -1','-mtime -1 = modified less than 1 day ago. Checks key system directories for recent changes — useful for detecting dropped malware or config tampering.'],
+    ]
+  },
+  {
+    id:'ir2', cat:'Incident Response / Forensics', os:'bash',
+    title:'Auth Log Parser',
+    desc:'Extract failed logins, successful logins, and brute-force IPs from auth.log.',
+    usecase:'Post-incident analysis of SSH brute force. Identify attacker IPs to block. SIEM prep for smaller environments.',
+    saveas:'auth_log_parse.sh',
+    code:
+"#!/bin/bash\nLOG=${1:-\"/var/log/auth.log\"}\nTHRESHOLD=${2:-5}   # Flag IPs with this many failures\n\nif [ ! -f \"$LOG\" ]; then\n  echo \"[-] Log not found: $LOG\"\n  exit 1\nfi\n\necho \"=== AUTH LOG ANALYSIS: $LOG ===\"\necho \"Generated: $(date)\"\necho \"\"\n\necho \"[ FAILED LOGIN ATTEMPTS ]\"\nFAILED=$(grep \"Failed password\" \"$LOG\" | wc -l)\necho \"  Total failed: $FAILED\"\necho \"\"\n\necho \"[ TOP ATTACKER IPs (>= $THRESHOLD attempts) ]\"\ngrep \"Failed password\" \"$LOG\" | \\\n  grep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' | \\\n  sort | uniq -c | sort -rn | \\\n  awk -v thresh=\"$THRESHOLD\" '$1 >= thresh {printf \"  %5d attempts: %s\\n\", $1, $2}'\n\necho \"\"\necho \"[ SUCCESSFUL LOGINS ]\"\ngrep \"Accepted password\\|Accepted publickey\" \"$LOG\" | \\\n  grep -oE '[0-9]{1,3}(\\.[0-9]{1,3}){3}' | \\\n  sort | uniq -c | sort -rn | \\\n  awk '{printf \"  %3d logins from: %s\\n\", $1, $2}'\n\necho \"\"\necho \"[ INVALID USERNAMES ATTEMPTED ]\"\ngrep \"Invalid user\" \"$LOG\" | \\\n  awk '{print $8}' | sort | uniq -c | sort -rn | head -10\n\necho \"\"\necho \"[ RECENT ROOT LOGIN ATTEMPTS ]\"\ngrep \"user root\" \"$LOG\" | tail -5",
+    teach:[
+      ['grep "Failed password" "$LOG" | wc -l','Pipes grep matches into wc. -l counts lines. Each failed attempt is one line in auth.log, so this gives total attempts.'],
+      ['grep -oE \'[0-9]{1,3}(\\.[0-9]{1,3}){3}\'','-o = print only the matched part (not the whole line). -E = extended regex. The pattern matches IPv4 addresses. Extracts IPs from each log line.'],
+      ['sort | uniq -c | sort -rn','Classic frequency analysis pipeline. sort groups identical lines. uniq -c prepends count. sort -rn sorts numerically in reverse (highest first).'],
+      ['awk -v thresh="$THRESHOLD"','-v passes a shell variable into awk. Inside awk, thresh is now available. $1 >= thresh filters to only IPs with enough failures.'],
+      ['grep "Accepted password\\|Accepted publickey"','Escaped pipe \\| in basic grep = OR. Matches either authentication method. Shows which IPs successfully logged in.'],
+      ['awk \'{print $8}\'','awk with default whitespace delimiter. auth.log "Invalid user X from Y" — field 8 is the attempted username. Fast log field extraction.'],
+    ]
+  },
+  {
+    id:'ir3', cat:'Incident Response / Forensics', os:'bash',
+    title:'File Integrity Checker',
+    desc:'Hash critical system files, save baseline, and detect changes on re-run.',
+    usecase:'Detect malware or unauthorized changes to system binaries. Manual poor-man\'s AIDE/Tripwire.',
+    saveas:'file_integrity.sh',
+    code:
+"#!/bin/bash\nBASELINE=\"fim_baseline.txt\"\nDIRS=\"/bin /sbin /usr/bin /usr/sbin /etc\"\n\nif [ ! -f \"$BASELINE\" ]; then\n  echo \"[*] Creating baseline hash database...\"\n  echo \"# File Integrity Baseline — $(date)\" > \"$BASELINE\"\n  find $DIRS -type f 2>/dev/null | sort | while read -r FILE; do\n    sha256sum \"$FILE\" >> \"$BASELINE\" 2>/dev/null\n  done\n  COUNT=$(wc -l < \"$BASELINE\")\n  echo \"[+] Baseline created: $COUNT files hashed.\"\n  echo \"    Saved: $BASELINE\"\nelse\n  echo \"[*] Running integrity check against baseline...\"\n  CHANGED=0\n  MISSING=0\n  while IFS= read -r LINE; do\n    [[ \"$LINE\" =~ ^# ]] && continue  # skip comments\n    HASH=$(echo \"$LINE\" | awk '{print $1}')\n    FILE=$(echo \"$LINE\" | awk '{print $2}')\n    if [ ! -f \"$FILE\" ]; then\n      echo \"  [MISSING] $FILE\"\n      ((MISSING++))\n    else\n      CURRENT=$(sha256sum \"$FILE\" 2>/dev/null | awk '{print $1}')\n      if [ \"$CURRENT\" != \"$HASH\" ]; then\n        echo \"  [CHANGED] $FILE\"\n        ((CHANGED++))\n      fi\n    fi\n  done < \"$BASELINE\"\n  echo \"\"\n  echo \"[+] Check complete. Changed: $CHANGED | Missing: $MISSING\"\n  [ $((CHANGED+MISSING)) -eq 0 ] && echo \"    All files match baseline.\"\nfi",
+    teach:[
+      ['if [ ! -f "$BASELINE" ]','File test: -f = exists and is a regular file. ! negates. First run creates baseline; subsequent runs compare against it.'],
+      ['sha256sum "$FILE"','Computes SHA-256 hash of a file. Output: "hash  filename". SHA-256 is cryptographically strong — any byte change in the file produces a completely different hash.'],
+      ['[[ "$LINE" =~ ^# ]]','[[ ]] is bash\'s extended test. =~ is regex match. ^# = starts with #. Skips comment lines in the baseline file.'],
+      ['HASH=$(echo "$LINE" | awk \'{print $1}\')','Splits each baseline line into hash (field 1) and filename (field 2) using awk. sha256sum output uses 2-space separator.'],
+      ['CURRENT=$(sha256sum "$FILE" | awk \'{print $1}\')','Re-hashes the file on disk and extracts just the hash. Then compares to stored baseline hash.'],
+      ['[ $((CHANGED+MISSING)) -eq 0 ]','Arithmetic test. $((expr)) computes the sum. [ -eq ] checks equality. Clean exit message if everything matches.'],
+    ]
+  },
+
+  // ─── INTUNE / MDM TASKS ───────────────────────────────────────────
+  {
+    id:'mdm1', cat:'Intune / MDM Tasks', os:'ps',
+    title:'Check Intune Enrollment Status',
+    desc:'Verify device MDM enrollment, check-in time, and compliance state via PowerShell.',
+    usecase:'VUMC field tech quick-check: verify a provisioned device is enrolled and compliant before handing off to user.',
+    saveas:'check_intune_enrollment.ps1',
+    code:
+"# Check Intune / MDM Enrollment Status\n# Run as Administrator on the device\n\nWrite-Host \"=== INTUNE ENROLLMENT STATUS ===\" -ForegroundColor Cyan\n\n# Get MDM enrollment info from registry\n$EnrollPath = \"HKLM:\\\\SOFTWARE\\\\Microsoft\\\\Enrollments\"\n$Enrollments = Get-ChildItem $EnrollPath -ErrorAction SilentlyContinue\n\nif (-not $Enrollments) {\n    Write-Host \"[-] No MDM enrollments found.\" -ForegroundColor Red\n    exit 1\n}\n\nforeach ($Enrollment in $Enrollments) {\n    $Props = Get-ItemProperty $Enrollment.PSPath -ErrorAction SilentlyContinue\n    if ($Props.ProviderID -eq \"MS DM Server\") {\n        Write-Host \"`n[+] MDM Enrollment Found:\" -ForegroundColor Green\n        Write-Host \"    UPN:         $($Props.UPN)\"\n        Write-Host \"    Enrollment:  $($Props.EnrollmentState)\"\n        Write-Host \"    Server:      $($Props.DMServerURL)\"\n    }\n}\n\n# Check last MDM sync time\nWrite-Host \"`n=== LAST SYNC INFO ===\" -ForegroundColor Cyan\n$SyncPath = \"HKLM:\\\\SOFTWARE\\\\Microsoft\\\\PolicyManager\\\\current\\\\device\"\nif (Test-Path $SyncPath) {\n    $LastSync = Get-ItemProperty $SyncPath -Name \"LastSyncAttemptTime\" -ErrorAction SilentlyContinue\n    if ($LastSync) {\n        $SyncTime = [DateTime]::FromFileTime($LastSync.LastSyncAttemptTime)\n        Write-Host \"Last sync attempt: $SyncTime\"\n    }\n}\n\n# Show MDM diagnostic summary\nWrite-Host \"`n=== DEVICE INFO ===\" -ForegroundColor Cyan\nGet-CimInstance Win32_ComputerSystem | Select-Object Name, UserName, Domain | Format-List\nGet-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, LastBootUpTime | Format-List",
+    teach:[
+      ['Write-Host "..." -ForegroundColor Cyan','PowerShell output command with color. -ForegroundColor accepts color names. Write-Host writes to host console only (not pipeline).'],
+      ['Get-ChildItem $EnrollPath -ErrorAction SilentlyContinue','Get-ChildItem (alias: ls, dir, gci) lists items. -ErrorAction SilentlyContinue suppresses errors and continues — important for registry paths that may not exist.'],
+      ['foreach ($Enrollment in $Enrollments)','PowerShell foreach loop. $Enrollment takes each item from the collection. Conventional to use singular/plural naming.'],
+      ['$Props.ProviderID -eq "MS DM Server"','-eq is PowerShell\'s equality operator. Not == like most languages. PowerShell uses -eq, -ne, -gt, -lt, -like, -match for comparisons.'],
+      ['[DateTime]::FromFileTime(...)','Converts Windows FILETIME (100-nanosecond intervals since 1601-01-01) to a human-readable DateTime. Static method call with :: syntax.'],
+      ['Get-CimInstance Win32_ComputerSystem','CIM (Common Information Model) — the modern WMI. Win32_ComputerSystem is one of many hardware/OS classes. More reliable than WMIC in modern PowerShell.'],
+    ]
+  },
+  {
+    id:'mdm2', cat:'Intune / MDM Tasks', os:'ps',
+    title:'Force Intune Sync',
+    desc:'Trigger an immediate MDM policy sync without waiting for scheduled check-in.',
+    usecase:'After pushing a new policy in Intune, force the device to pull changes immediately instead of waiting up to 8 hours.',
+    saveas:'force_intune_sync.ps1',
+    code:
+"# Force Immediate Intune MDM Sync\n# Useful after policy changes — avoids waiting for scheduled check-in\n\nWrite-Host \"[*] Triggering Intune MDM sync...\" -ForegroundColor Yellow\n\ntry {\n    # Method 1: DeviceManagement bridge (Windows 10/11)\n    $session = New-Object -ComObject Microsoft.MDM.MaintenanceTask\n    $session.Exec(\"3\") | Out-Null\n    Write-Host \"[+] MDM maintenance task triggered.\" -ForegroundColor Green\n}\ncatch {\n    Write-Host \"[-] COM method failed, trying scheduled task...\" -ForegroundColor Yellow\n    # Method 2: Scheduled task (fallback)\n    $task = Get-ScheduledTask -TaskPath \"\\Microsoft\\Windows\\EnterpriseMgmt\\*\" `\n                              -TaskName \"*pushLaunch*\" -ErrorAction SilentlyContinue\n    if ($task) {\n        Start-ScheduledTask -InputObject $task\n        Write-Host \"[+] Enterprise management task started.\" -ForegroundColor Green\n    } else {\n        Write-Host \"[-] Could not find sync task. Try: Settings > Accounts > MDM > Sync\" -ForegroundColor Red\n    }\n}\n\n# Show event log entries for sync results\nWrite-Host \"`n[*] Recent MDM events (last 10):\" -ForegroundColor Cyan\nGet-WinEvent -LogName \"Microsoft-Windows-DeviceManagement-Enterprise-Diagnostics-Provider/Admin\" `\n             -MaxEvents 10 -ErrorAction SilentlyContinue |\n    Select-Object TimeCreated, LevelDisplayName, Message |\n    Format-Table -Wrap -AutoSize",
+    teach:[
+      ['New-Object -ComObject','Creates a COM (Component Object Model) object — Windows\'s inter-process communication system. MDM components are exposed as COM objects.'],
+      ['try { ... } catch { ... }','PowerShell exception handling. If code in try{} throws a terminating error, execution jumps to catch{}. Use for operations that might fail.'],
+      ['Out-Null','Discards output (like > /dev/null in bash). Used when a method returns something but we don\'t care about the return value.'],
+      ['Get-ScheduledTask -TaskPath "\\Microsoft\\Windows\\EnterpriseMgmt\\*"','Queries the Windows Task Scheduler. -TaskPath uses wildcard * to match any subfolder. Intune uses scheduled tasks for sync triggers.'],
+      ['Get-WinEvent -LogName "..."','Reads Windows Event Log. More powerful than Get-EventLog (which is deprecated). The long log name is the exact path in Event Viewer for MDM events.'],
+      ['Format-Table -Wrap -AutoSize','-Wrap allows long strings to wrap within cells instead of truncating. -AutoSize adjusts column widths to content. Always add these for readable output.'],
+    ]
+  },
+  {
+    id:'mdm3', cat:'Intune / MDM Tasks', os:'ps',
+    title:'Device Provisioning Checklist',
+    desc:'Run through all VUMC-style provisioning checks: domain join, Intune, apps, updates.',
+    usecase:'Field tech provisioning runbook — automated version of manual checklist. Run before handing off a device.',
+    saveas:'provision_checklist.ps1',
+    code:
+"# Device Provisioning Checklist\n# Run as Administrator after imaging\n\n$PASS = \"[PASS]\"; $FAIL = \"[FAIL]\"; $WARN = \"[WARN]\"\n\nfunction Check($label, $result, $detail=\"\") {\n    $status = if ($result) { Write-Host \"$PASS $label\" -ForegroundColor Green }\n              else          { Write-Host \"$FAIL $label\" -ForegroundColor Red }\n    if ($detail) { Write-Host \"       $detail\" -ForegroundColor DarkGray }\n}\n\nWrite-Host \"=== PROVISIONING CHECKLIST: $env:COMPUTERNAME ===\" -ForegroundColor Cyan\nWrite-Host \"Date: $(Get-Date)\" \n\n# 1. Domain / Azure AD Join\n$dsreg = dsregcmd /status 2>&1\nCheck \"Azure AD Joined\"    ($dsreg -match \"AzureAdJoined\\s*:\\s*YES\")\nCheck \"Domain Joined\"      ($dsreg -match \"DomainJoined\\s*:\\s*YES\")\n\n# 2. Intune Enrolled\n$enrolled = Get-ChildItem \"HKLM:\\SOFTWARE\\Microsoft\\Enrollments\" -ErrorAction SilentlyContinue |\n    Where-Object { (Get-ItemProperty $_.PSPath).ProviderID -eq \"MS DM Server\" }\nCheck \"Intune Enrolled\" ($null -ne $enrolled)\n\n# 3. Windows Updates\n$pending = (New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search(\"IsInstalled=0\").Updates.Count\nCheck \"No Pending Updates\" ($pending -eq 0) \"Pending: $pending\"\n\n# 4. Defender / AV Status\n$av = Get-MpComputerStatus -ErrorAction SilentlyContinue\nCheck \"Defender Enabled\"   ($av.AntivirusEnabled)\nCheck \"Definitions Current\" (((Get-Date) - $av.AntivirusSignatureLastUpdated).TotalDays -lt 2)\n\n# 5. Firewall\n$fw = Get-NetFirewallProfile | Where-Object { -not $_.Enabled }\nCheck \"Firewall All Profiles ON\" ($fw.Count -eq 0) \"Off profiles: $($fw.Name -join ', ')\"\n\n# 6. BitLocker\n$bl = Get-BitLockerVolume -MountPoint \"C:\" -ErrorAction SilentlyContinue\nCheck \"BitLocker Active\" ($bl.ProtectionStatus -eq \"On\") \"Status: $($bl.ProtectionStatus)\"\n\n# 7. Required apps (edit list as needed)\n$REQUIRED_APPS = @(\"Microsoft Teams\", \"Company Portal\")\nforeach ($app in $REQUIRED_APPS) {\n    $found = Get-AppxPackage -Name \"*$app*\" -ErrorAction SilentlyContinue\n    Check \"App: $app\" ($null -ne $found)\n}\n\nWrite-Host \"`n=== CHECKLIST COMPLETE ===\" -ForegroundColor Cyan",
+    teach:[
+      ['function Check($label, $result, $detail="")','Defines a reusable PowerShell function with a default parameter value. Keeps the code DRY — one function handles all checks.'],
+      ['$env:COMPUTERNAME','$env: is PowerShell\'s way to access environment variables. Equivalent to %COMPUTERNAME% in CMD or $HOSTNAME in bash.'],
+      ['dsregcmd /status 2>&1','dsregcmd is a Windows built-in for device registration state. 2>&1 captures stderr into the variable too. -match then checks the output with regex.'],
+      ['(New-Object -ComObject Microsoft.Update.Session)','Instantiates the Windows Update COM interface. CreateUpdateSearcher().Search() queries for updates matching the filter. "IsInstalled=0" = not yet installed.'],
+      ['Get-MpComputerStatus','Gets Windows Defender/Microsoft Defender Antivirus status. MpComputer = Malware Protection computer. Properties like AntivirusEnabled are boolean.'],
+      ['Get-NetFirewallProfile | Where-Object { -not $_.Enabled }','Where-Object filters a pipeline. $_ is the current object. Returns profiles where Enabled = false. Count -eq 0 means all profiles are on.'],
+      ['$REQUIRED_APPS = @(...)','PowerShell array literal. @() is the array operator. Useful for building configurable lists — edit this array for different deployment templates.'],
+    ]
+  },
+
+  // ─── LOG PARSING / SIEM PREP ──────────────────────────────────────
+  {
+    id:'log1', cat:'Log Parsing / SIEM Prep', os:'bash',
+    title:'Apache/Nginx Access Log Analyzer',
+    desc:'Parse web server logs: top IPs, top URLs, status codes, and 4xx/5xx errors.',
+    usecase:'Analyze web server logs without a SIEM. Spot scanning, brute force, or DDoS patterns on client web servers.',
+    saveas:'web_log_analyze.sh',
+    code:
+"#!/bin/bash\n# Usage: ./web_log_analyze.sh [logfile] [top_n]\nLOG=${1:-\"/var/log/nginx/access.log\"}\nTOP=${2:-10}\n\nif [ ! -f \"$LOG\" ]; then\n  echo \"[-] Log not found: $LOG\"\n  exit 1\nfi\n\nTOTAL=$(wc -l < \"$LOG\")\necho \"=== WEB LOG ANALYSIS: $LOG ===\"\necho \"Total requests: $TOTAL\"\necho \"\"\n\necho \"[ TOP $TOP IPs ]\"\nawk '{print $1}' \"$LOG\" | sort | uniq -c | sort -rn | head -$TOP | \\\n  awk '{printf \"  %6d requests: %s\\n\", $1, $2}'\n\necho \"\"\necho \"[ TOP $TOP URLS ]\"\nawk '{print $7}' \"$LOG\" | sort | uniq -c | sort -rn | head -$TOP | \\\n  awk '{printf \"  %6d hits: %s\\n\", $1, $2}'\n\necho \"\"\necho \"[ HTTP STATUS CODES ]\"\nawk '{print $9}' \"$LOG\" | sort | uniq -c | sort -rn | \\\n  awk '{printf \"  %6d x HTTP %s\\n\", $1, $2}'\n\necho \"\"\necho \"[ 4xx / 5xx ERRORS (last 20) ]\"\nawk '$9 ~ /^[45]/' \"$LOG\" | tail -20 | \\\n  awk '{printf \"  [%s] %s %s %s\\n\", $9, $1, $6, $7}'\n\necho \"\"\necho \"[ REQUESTS PER HOUR ]\"\nawk '{print substr($4,2,14)}' \"$LOG\" | \\\n  awk -F: '{print $1\":\"$2}' | \\\n  sort | uniq -c | sort -k2",
+    teach:[
+      ['awk \'{print $1}\' "$LOG"','Common log format: $1=IP, $7=URL, $9=status. awk prints only the field we want from each line. No need to read the whole line into memory.'],
+      ['sort | uniq -c | sort -rn','The universal frequency analysis pipeline. sort groups lines. uniq -c counts consecutive duplicates. sort -rn sorts highest count first.'],
+      ['awk \'{print $7}\'','Field 7 in CLF is the request path (e.g., /admin/login). Note: awk field numbers match the CLF column order — adapt for different log formats.'],
+      ['awk \'$9 ~ /^[45]/\'','awk filter: $9 = status code field. ~ = regex match. /^[45]/ = starts with 4 or 5. Filters to client errors (4xx) and server errors (5xx).'],
+      ['substr($4,2,14)','awk built-in: substr(string, start, length). $4 is the timestamp [10/Apr/2025:14:23:01. start=2 skips [. length=14 gets the date+hour part.'],
+    ]
+  },
+  {
+    id:'log2', cat:'Log Parsing / SIEM Prep', os:'bash',
+    title:'Windows Event Log Extractor',
+    desc:'Pull critical security events from Windows logs via PowerShell. Export to CSV.',
+    usecase:'Pre-SIEM log collection for small environments. Identify logon failures, account changes, and service installs.',
+    saveas:'event_log_extract.ps1',
+    code:
+"# Windows Event Log Security Extractor\n# Exports critical security events to CSV for SIEM ingestion or manual analysis\n\nparam(\n    [int]$DaysBack = 7,\n    [string]$OutPath = \"security_events_$(Get-Date -f 'yyyyMMdd').csv\"\n)\n\nWrite-Host \"[*] Pulling security events from last $DaysBack days...\" -ForegroundColor Cyan\n\n$StartTime = (Get-Date).AddDays(-$DaysBack)\n\n# Critical Event IDs\n$EventIDs = @{\n    4624 = \"Successful Logon\"\n    4625 = \"Failed Logon\"\n    4648 = \"Logon with Explicit Creds\"\n    4720 = \"User Account Created\"\n    4726 = \"User Account Deleted\"\n    4732 = \"User Added to Admin Group\"\n    4756 = \"User Added to Universal Group\"\n    7045 = \"New Service Installed\"\n    4688 = \"New Process Created\"\n}\n\n$Results = @()\n\nforeach ($ID in $EventIDs.Keys) {\n    Write-Host \"  Querying Event ID $ID ($($EventIDs[$ID]))...\"\n    $Events = Get-WinEvent -FilterHashtable @{\n        LogName   = if ($ID -eq 7045) {\"System\"} else {\"Security\"}\n        Id        = $ID\n        StartTime = $StartTime\n    } -ErrorAction SilentlyContinue\n\n    foreach ($Event in $Events) {\n        $Results += [PSCustomObject]@{\n            TimeCreated  = $Event.TimeCreated\n            EventID      = $ID\n            EventName    = $EventIDs[$ID]\n            Computer     = $Event.MachineName\n            Message      = ($Event.Message -split \"`n\")[0]  # First line only\n        }\n    }\n}\n\n$Results | Sort-Object TimeCreated -Descending | Export-Csv -Path $OutPath -NoTypeInformation\nWrite-Host \"[+] $($Results.Count) events exported to: $OutPath\" -ForegroundColor Green\n\n# Quick summary\nWrite-Host \"`n[ SUMMARY ]\" -ForegroundColor Cyan\n$Results | Group-Object EventName | Sort-Object Count -Descending |\n    Format-Table Name, Count -AutoSize",
+    teach:[
+      ['param([int]$DaysBack = 7, ...)','PowerShell param block. Defines script parameters with types and defaults. Call as: .\\script.ps1 -DaysBack 30. Type enforcement is built-in.'],
+      ['$EventIDs = @{4624 = "Successful Logon"...}','Hashtable (dictionary) literal @{}. Key-value pairs. Hashtables let you map numeric Event IDs to human-readable names.'],
+      ['Get-WinEvent -FilterHashtable @{...}','-FilterHashtable is faster than -FilterXPath for most queries. Pass a hashtable with LogName, Id, StartTime etc. Much faster than piping Where-Object.'],
+      ['if ($ID -eq 7045) {"System"} else {"Security"}','PowerShell inline if-expression. Returns a value. Event ID 7045 (new service) lives in the System log, not Security.'],
+      ['[PSCustomObject]@{...}','Creates a custom object with named properties. [PSCustomObject] is the fastest way to make structured data in PowerShell. Works perfectly with Export-Csv.'],
+      ['($Event.Message -split "`n")[0]','-split splits a string into array by delimiter. `n is a newline (backtick escaping in PowerShell, not backslash). [0] gets first element (first line).'],
+      ['Export-Csv -NoTypeInformation','Exports objects to CSV. -NoTypeInformation removes the ugly #TYPE header line. Ready for Excel or SIEM import.'],
+    ]
+  },
+  {
+    id:'log3', cat:'Log Parsing / SIEM Prep', os:'bash',
+    title:'Log Aggregator & Shipper',
+    desc:'Tail multiple log files, filter by severity, and ship to a remote syslog server.',
+    usecase:'DIY log forwarding for small environments without a log agent. Forward critical events to your SIEM or syslog collector.',
+    saveas:'log_shipper.sh',
+    code:
+"#!/bin/bash\n# Simple log aggregator — tails logs and forwards filtered lines to syslog\n# Usage: ./log_shipper.sh [syslog_host] [syslog_port]\n\nSYSLOG_HOST=${1:-\"192.168.1.100\"}\nSYSLOG_PORT=${2:-514}\nFACILITY=\"local0\"\nSEVERITY=\"warning\"\n\n# Logs to monitor\ndeclare -A LOG_TAGS\nLOG_TAGS[\"/var/log/auth.log\"]=\"auth\"\nLOG_TAGS[\"/var/log/syslog\"]=\"syslog\"\nLOG_TAGS[\"/var/log/nginx/error.log\"]=\"nginx\"\n\n# Keywords that elevate to alert\nALERT_PATTERN=\"(Failed|Error|CRITICAL|refused|invalid|attack|breach|unauthorized)\"\n\nsend_syslog() {\n  local TAG=\"$1\"\n  local MSG=\"$2\"\n  # Format: <priority>timestamp hostname tag: message\n  local PRI=$(( (16 * 8) + 4 ))  # local0.warning\n  echo \"<${PRI}>$(date '+%b %d %H:%M:%S') $(hostname) ${TAG}: ${MSG}\" | \\\n    nc -u -w1 \"$SYSLOG_HOST\" \"$SYSLOG_PORT\" 2>/dev/null\n}\n\necho \"[*] Log shipper started. Forwarding to $SYSLOG_HOST:$SYSLOG_PORT\"\necho \"[*] Monitoring: ${!LOG_TAGS[@]}\"\n\n# Tail all files simultaneously\ntail -F \"${!LOG_TAGS[@]}\" 2>/dev/null | \\\nwhile IFS= read -r LINE; do\n  if echo \"$LINE\" | grep -qiE \"$ALERT_PATTERN\"; then\n    echo \"  [ALERT] $LINE\"\n    send_syslog \"darkfire-agent\" \"$LINE\"\n  fi\ndone",
+    teach:[
+      ['declare -A LOG_TAGS','Declares an associative array (hashtable) in bash. -A = associative. Requires bash 4+. Maps file paths to their tag names.'],
+      ['LOG_TAGS["/var/log/auth.log"]="auth"','Sets a key-value pair in the associative array. Key is the log path, value is the syslog tag we\'ll attach to forwarded messages.'],
+      ['send_syslog() { local TAG="$1"; local MSG="$2"','Function definition. local makes variables scoped to the function — they don\'t leak into the global scope. $1, $2 are positional parameters.'],
+      ['local PRI=$(( (16 * 8) + 4 ))','Syslog priority calculation: facility * 8 + severity. local0=16, warning=4. RFC 5424 standard. The PRI value goes in the syslog <PRI> header.'],
+      ['nc -u -w1 "$SYSLOG_HOST" "$SYSLOG_PORT"','netcat in UDP mode (-u). -w1 = 1 second timeout. Sends syslog messages as UDP datagrams (default syslog transport). Simple but effective log shipping.'],
+      ['tail -F "${!LOG_TAGS[@]}"','${!array[@]} expands to all KEYS of an associative array. -F (capital) follows files even if they are rotated (recreated). Tails all log files simultaneously.'],
+      ['grep -qiE "$ALERT_PATTERN"','-q = quiet (no output, just exit code). -i = case-insensitive. -E = extended regex. Returns 0 (true) if pattern matches — perfect for if/while conditions.'],
+    ]
+  },
+
+  // ─── AUTOMATION / SCHEDULING ──────────────────────────────────────
+  {
+    id:'auto1', cat:'Automation / Scheduling', os:'bash',
+    title:'Cron Job Manager',
+    desc:'Interactive cron builder — compose, list, add, and remove cron jobs safely.',
+    usecase:'Learn cron syntax interactively and manage jobs without risk of corrupting your crontab.',
+    saveas:'cron_manager.sh',
+    code:
+"#!/bin/bash\n# Interactive cron job manager\n\nshow_menu() {\n  echo \"\"\n  echo \"=== CRON MANAGER ===\"\n  echo \"1) List current cron jobs\"\n  echo \"2) Add a new cron job (interactive)\"\n  echo \"3) Remove a cron job\"\n  echo \"4) Test cron schedule (explain timing)\"\n  echo \"5) Exit\"\n  echo -n \"Choice: \"\n}\n\nadd_cron() {\n  echo \"Cron format: MIN HOUR DOM MON DOW COMMAND\"\n  echo \"Examples:\"\n  echo \"  0 2 * * *    = 2:00 AM every day\"\n  echo \"  */15 * * * * = every 15 minutes\"\n  echo \"  0 9 * * 1    = 9:00 AM every Monday\"\n  echo \"\"\n  read -p \"Minute   (0-59 or */n): \" MIN\n  read -p \"Hour     (0-23 or */n): \" HOUR\n  read -p \"Day/Month(1-31 or *  ): \" DOM\n  read -p \"Month    (1-12 or *  ): \" MON\n  read -p \"Day/Week (0-6 or *   ): \" DOW\n  read -p \"Command to run: \" CMD\n  ENTRY=\"$MIN $HOUR $DOM $MON $DOW $CMD\"\n  echo \"\"\n  echo \"Preview: $ENTRY\"\n  read -p \"Add this job? (y/n): \" CONFIRM\n  if [ \"$CONFIRM\" = \"y\" ]; then\n    (crontab -l 2>/dev/null; echo \"$ENTRY\") | crontab -\n    echo \"[+] Cron job added.\"\n  fi\n}\n\nremove_cron() {\n  echo \"Current jobs:\"\n  crontab -l 2>/dev/null | nl -ba\n  read -p \"Enter line number to remove: \" NUM\n  crontab -l 2>/dev/null | sed \"${NUM}d\" | crontab -\n  echo \"[+] Job removed.\"\n}\n\nwhile true; do\n  show_menu\n  read CHOICE\n  case $CHOICE in\n    1) echo \"\"; crontab -l 2>/dev/null | nl -ba ;;\n    2) add_cron ;;\n    3) remove_cron ;;\n    4) echo \"Install 'cronsun' or visit: https://crontab.guru\" ;;\n    5) echo \"Exiting.\"; exit 0 ;;\n    *) echo \"[-] Invalid choice.\" ;;\n  esac\ndone",
+    teach:[
+      ['show_menu() { echo "..." }','Shell function definition. Functions in bash are just named groups of commands. Call them like regular commands: show_menu'],
+      ['read -p "Minute..." MIN','-p displays a prompt string inline. The user\'s input is stored in the named variable. No $ needed when storing — only when reading.'],
+      ['(crontab -l 2>/dev/null; echo "$ENTRY") | crontab -','The safe crontab append idiom. Subshell () runs both commands in sequence. Their combined stdout is piped to crontab -. The - means "read from stdin."'],
+      ['crontab -l 2>/dev/null | nl -ba','crontab -l lists jobs. nl -ba adds line numbers (-b = body, a = all lines including blank). Essential before removing by line number.'],
+      ['sed "${NUM}d" | crontab -','sed with the d command deletes a line. "${NUM}d" = delete line number $NUM. Pipe the result to crontab - to reinstall without that line.'],
+      ['case $CHOICE in','case statement — cleaner than nested if/elif for menu systems. Patterns end with ). *) = default/catch-all. ;; ends each case block.'],
+      ['while true; do ... done','Infinite loop — runs until an explicit exit or break. The menu pattern: loop forever, exit when user picks "Exit."'],
+    ]
+  },
+  {
+    id:'auto2', cat:'Automation / Scheduling', os:'ps',
+    title:'Windows Update Automation',
+    desc:'Check, download, and install Windows Updates silently via PowerShell.',
+    usecase:'VUMC field tech automation — patch machines remotely or on a schedule without user interaction.',
+    saveas:'windows_update.ps1',
+    code:
+"# Windows Update Automation\n# Requires: PSWindowsUpdate module (or runs built-in COM fallback)\n\nparam(\n    [switch]$AutoReboot,\n    [switch]$CheckOnly,\n    [string]$LogPath = \"C:\\Logs\\WindowsUpdate_$(Get-Date -f 'yyyyMMdd').log\"\n)\n\nfunction Write-Log($Msg) {\n    $Line = \"$(Get-Date -f 'HH:mm:ss') $Msg\"\n    Write-Host $Line\n    Add-Content -Path $LogPath -Value $Line -ErrorAction SilentlyContinue\n}\n\nNew-Item -Path (Split-Path $LogPath) -ItemType Directory -Force | Out-Null\nWrite-Log \"=== Windows Update Run: $env:COMPUTERNAME ===\"\n\n# Check for PSWindowsUpdate module\nif (Get-Module -ListAvailable -Name PSWindowsUpdate) {\n    Write-Log \"[*] Using PSWindowsUpdate module...\"\n    Import-Module PSWindowsUpdate\n\n    $Updates = Get-WindowsUpdate -MicrosoftUpdate\n    Write-Log \"[*] Found $($Updates.Count) updates available.\"\n\n    if (-not $CheckOnly -and $Updates.Count -gt 0) {\n        Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot | ForEach-Object {\n            Write-Log \"  Installing: $($_.Title) [$($_.KB)]\"\n        }\n    }\n} else {\n    Write-Log \"[*] PSWindowsUpdate not found. Using Windows Update COM...\"\n    $UpdateSession = New-Object -ComObject Microsoft.Update.Session\n    $Searcher = $UpdateSession.CreateUpdateSearcher()\n    $Results  = $Searcher.Search(\"IsInstalled=0 AND Type='Software'\")\n\n    Write-Log \"[*] Found $($Results.Updates.Count) updates.\"\n\n    if (-not $CheckOnly -and $Results.Updates.Count -gt 0) {\n        $Downloader = $UpdateSession.CreateUpdateDownloader()\n        $Downloader.Updates = $Results.Updates\n        Write-Log \"[*] Downloading...\"\n        $Downloader.Download() | Out-Null\n\n        $Installer = $UpdateSession.CreateUpdateInstaller()\n        $Installer.Updates = $Results.Updates\n        Write-Log \"[*] Installing...\"\n        $InstallResult = $Installer.Install()\n        Write-Log \"[+] Install result code: $($InstallResult.ResultCode)\"\n    }\n}\n\nif ($AutoReboot -and (Get-WURebootStatus -Silent 2>/dev/null)) {\n    Write-Log \"[!] Reboot required. Rebooting in 60 seconds...\"\n    shutdown /r /t 60 /c \"Windows Update complete — automatic reboot\"\n}\n\nWrite-Log \"=== Complete ===\"",
+    teach:[
+      ['param([switch]$AutoReboot, [switch]$CheckOnly)','[switch] = boolean flag parameter. Call as: .\\script.ps1 -AutoReboot -CheckOnly. Inside script, $AutoReboot is $true if flag was passed.'],
+      ['Add-Content -Path $LogPath -Value $Line','Appends text to a file, creating it if needed. More explicit than >>. -ErrorAction SilentlyContinue keeps going if disk is full or path is wrong.'],
+      ['Split-Path $LogPath','Extracts the directory portion of a path. "C:\\Logs\\file.txt" -> "C:\\Logs". Used with New-Item to ensure the log directory exists.'],
+      ['Get-Module -ListAvailable -Name PSWindowsUpdate','-ListAvailable checks all module paths without loading. Returns module info or $null. Used to detect whether optional module is installed.'],
+      ['New-Object -ComObject Microsoft.Update.Session','The Windows Update COM API. Three-step pattern: create session → search → download → install. This is what Windows Update itself uses internally.'],
+      ['$Searcher.Search("IsInstalled=0 AND Type=\'Software\'")',"The WU search query language. IsInstalled=0 = not yet installed. Type='Software' excludes drivers. Combine conditions with AND."],
+      ['$InstallResult.ResultCode','Result codes: 1=Not Started, 2=In Progress, 3=Success, 4=Failure, 5=Aborted. Log this to track failed patches for follow-up.'],
+    ]
+  },
+  {
+    id:'auto3', cat:'Automation / Scheduling', os:'bash',
+    title:'System Health Monitor (Cron)',
+    desc:'Scheduled health check: CPU, RAM, disk, and failing services. Emails alerts.',
+    usecase:'Set this on a 15-minute cron to monitor any Linux server. Catches resource exhaustion before users notice.',
+    saveas:'health_monitor.sh',
+    code:
+"#!/bin/bash\n# System Health Monitor — designed to run via cron every 15 min\n# Add to cron: */15 * * * * /path/to/health_monitor.sh\n\nALERT_EMAIL=\"jazzy@darkfiresecurity.com\"\nHOST=$(hostname)\nLOG=\"/var/log/health_monitor.log\"\nISSUES=0\nREPORT=\"\"\n\nlog() {\n  REPORT=\"${REPORT}\\n$1\"\n  echo \"$(date '+%Y-%m-%d %H:%M:%S') $1\" >> \"$LOG\"\n}\n\n# ── CPU Usage ──\nCPU_IDLE=$(top -bn1 | grep \"Cpu(s)\" | awk '{print $8}' | tr -d '%')\nCPU_USED=$(echo \"100 - $CPU_IDLE\" | bc)\nlog \"CPU Usage: ${CPU_USED}%\"\nif (( $(echo \"$CPU_USED > 90\" | bc -l) )); then\n  log \"  [ALERT] CPU > 90%!\"\n  ((ISSUES++))\nfi\n\n# ── Memory ──\nMEM_FREE=$(free | awk '/^Mem:/{printf \"%.0f\", $4/$2*100}')\nlog \"Free Memory: ${MEM_FREE}%\"\nif [ \"$MEM_FREE\" -lt 10 ]; then\n  log \"  [ALERT] Memory < 10% free!\"\n  ((ISSUES++))\nfi\n\n# ── Disk Usage ──\nwhile IFS= read -r LINE; do\n  USE=$(echo \"$LINE\" | awk '{print $5}' | tr -d '%')\n  MNT=$(echo \"$LINE\" | awk '{print $6}')\n  log \"Disk $MNT: ${USE}%\"\n  if [ \"$USE\" -gt 85 ]; then\n    log \"  [ALERT] Disk $MNT > 85%!\"\n    ((ISSUES++))\n  fi\ndone < <(df -h | tail -n +2)\n\n# ── Failed Services ──\nFAILED=$(systemctl --failed --no-legend 2>/dev/null | awk '{print $1}' | tr '\\n' ' ')\nif [ -n \"$FAILED\" ]; then\n  log \"  [ALERT] Failed services: $FAILED\"\n  ((ISSUES++))\nfi\n\n# ── Send Email Alert ──\nif [ \"$ISSUES\" -gt 0 ] && command -v mail &>/dev/null; then\n  echo -e \"$REPORT\" | mail -s \"[ALERT] $HOST Health: $ISSUES issue(s)\" \"$ALERT_EMAIL\"\n  log \"Alert email sent to $ALERT_EMAIL\"\nfi\n\nlog \"Health check done. Issues: $ISSUES\"",
+    teach:[
+      ['top -bn1','top in batch mode (-b), one iteration (-n1). Non-interactive snapshot of process stats. Pipe to grep/awk to extract specific metrics.'],
+      ['echo "100 - $CPU_IDLE" | bc','bc = basic calculator. Evaluates math expressions from stdin. Handles decimals unlike bash $(( )). -l = math library (for floating point).'],
+      ['REPORT="${REPORT}\\n$1"','Appends to the REPORT string with a newline. String concatenation in bash — just expand the existing variable with new content appended. echo -e later interprets \\n.'],
+      ['(( $(echo "$CPU_USED > 90" | bc -l) ))','Passes the comparison to bc (which returns 1=true or 0=false), then uses (( )) to test the integer result. bc handles float comparisons that bash can\'t.'],
+      ['free | awk \'/^Mem:/{printf "%.0f", $4/$2*100}\'','/pattern/ in awk filters to matching lines. Calculates free memory as percentage. %.0f = format as integer (0 decimal places).'],
+      ['systemctl --failed --no-legend','Lists systemd units in "failed" state. --no-legend removes the header/footer lines. Piping to awk extracts just the unit names.'],
+      ['command -v mail &>/dev/null','Checks if a command exists without running it. Returns 0 (true) if found. Better than which for conditional checks in scripts.'],
+    ]
+  },
+
+  // ─── SYSTEM ADMIN ─────────────────────────────────────────────────
+  {
+    id:'sys1', cat:'System Administration', os:'bash',
+    title:'User Account Auditor',
+    desc:'Enumerate users, shells, sudo rights, last logins, and empty passwords.',
+    usecase:'HIPAA-adjacent audit: verify no ghost or unauthorized accounts exist on systems you manage.',
+    saveas:'user_audit.sh',
+    code:
+"#!/bin/bash\n# Full user account audit — run as root\n\necho \"╔══════════════════════════════════╗\"\necho \"║     USER ACCOUNT AUDIT REPORT   ║\"\necho \"║   $(hostname) — $(date '+%Y-%m-%d')   ║\"\necho \"╚══════════════════════════════════╝\"\n\necho \"\"\necho \"[ INTERACTIVE USER ACCOUNTS ]\"\necho \"(Users with login shells)\"\nawk -F: '$7 !~ /nologin|false|sync|shutdown/ {\n  printf \"  %-15s UID:%-6s Shell: %s\\n\", $1, $3, $7\n}' /etc/passwd\n\necho \"\"\necho \"[ SUDO / WHEEL GROUP MEMBERS ]\"\ngetent group sudo 2>/dev/null | awk -F: '{print \"  sudo: \"$4}'\ngetent group wheel 2>/dev/null | awk -F: '{print \"  wheel: \"$4}'\necho \"\"\necho \"  /etc/sudoers snippets:\"\ngrep -v '^#\\|^$' /etc/sudoers 2>/dev/null | grep -v \"^Default\" | head -10\n\necho \"\"\necho \"[ LAST 15 LOGINS ]\"\nlast -n 15 -F | awk '{printf \"  %-10s %-20s %s %s\\n\", $1, $3, $5, $6}'\n\necho \"\"\necho \"[ ACCOUNTS WITH NO PASSWORD (security risk) ]\"\nsudo awk -F: '($2 == \"\" ) {print \"  [!] No password: \"$1}' /etc/shadow 2>/dev/null\n\necho \"\"\necho \"[ RECENTLY CREATED USERS (30 days) ]\"\nfind /home -maxdepth 1 -type d -newer /etc/passwd -mtime -30 2>/dev/null | \\\n  xargs -I{} echo \"  New home: {}\"\n\necho \"\"\necho \"[ USERS WITH UID 0 (root equivalents) ]\"\nawk -F: '$3 == 0 {print \"  [!] UID 0: \"$1}' /etc/passwd",
+    teach:[
+      ['awk -F: \'$7 !~ /nologin|false/\'','-F: sets colon as field separator. $7 is the shell field in /etc/passwd. !~ means "does not match the regex." Filters out system/service accounts.'],
+      ['getent group sudo','getent queries NSS databases (accounts, groups, hosts). More portable than reading /etc/group directly — works with LDAP/AD too.'],
+      ['grep -v \'^#\\|^$\'','-v inverts match (exclude). ^# = comment lines. ^$ = blank lines. \\| is OR in basic grep. Shows only real sudoers rules.'],
+      ['last -n 15 -F','-n 15 = show last 15 entries. -F = full timestamp (includes year, removes ambiguity). Reads from /var/log/wtmp binary file.'],
+      ['awk -F: \'($2 == "")\' /etc/shadow','Checks the password field of shadow. Empty $2 = no password set. These accounts can be logged into without authentication — critical finding.'],
+      ['find /home -maxdepth 1 -newer /etc/passwd -mtime -30','-maxdepth 1 = don\'t recurse. -newer = modified more recently than the reference file. -mtime -30 = modified within 30 days. Finds recently created home dirs.'],
+    ]
+  },
+  {
+    id:'sys2', cat:'System Administration', os:'ps',
+    title:'Windows System Audit',
+    desc:'Enumerate users, admins, open ports, startup programs, and running services.',
+    usecase:'Field tech: quick audit of an unfamiliar or newly imaged Windows machine before deployment.',
+    saveas:'windows_audit.ps1',
+    code:
+"# Windows System Audit Script\n# Run as Administrator\n\n$Host.UI.RawUI.WindowTitle = \"DFS System Audit\"\n$OUT = \"audit_$env:COMPUTERNAME`_$(Get-Date -f 'yyyyMMdd_HHmmss').txt\"\n\nfunction Section($title) {\n    $line = \"=\" * 50\n    Write-Host \"`n$line`n  $title`n$line\" -ForegroundColor Cyan\n    \"`n$line`n  $title`n$line\" | Add-Content $OUT\n}\n\nfunction Out($msg) { Write-Host $msg; $msg | Add-Content $OUT }\n\nOut \"WINDOWS SYSTEM AUDIT — $env:COMPUTERNAME — $(Get-Date)\"\n\nSection \"LOCAL USER ACCOUNTS\"\nGet-LocalUser | ForEach-Object {\n    Out (\"  {0,-20} Enabled:{1}  LastLogon:{2}\" -f $_.Name, $_.Enabled, $_.LastLogon)\n}\n\nSection \"ADMINISTRATOR GROUP MEMBERS\"\nGet-LocalGroupMember -Group \"Administrators\" | ForEach-Object {\n    Out \"  $($_.Name) [$($_.ObjectClass)]\"\n}\n\nSection \"RUNNING SERVICES\"\nGet-Service | Where-Object Status -eq Running |\n    Select-Object Name, DisplayName, StartType |\n    Sort-Object Name |\n    ForEach-Object { Out (\"  {0,-25} {1}\" -f $_.Name, $_.DisplayName) }\n\nSection \"LISTENING TCP PORTS\"\nGet-NetTCPConnection -State Listen |\n    Select-Object LocalPort, @{N=\"Process\";E={(Get-Process -Id $_.OwningProcess -EA SilentlyContinue).Name}} |\n    Sort-Object LocalPort |\n    ForEach-Object { Out (\"  Port {0,-6} -> {1}\" -f $_.LocalPort, $_.Process) }\n\nSection \"STARTUP PROGRAMS\"\nGet-CimInstance Win32_StartupCommand |\n    ForEach-Object { Out \"  [$($_.Location)] $($_.Name): $($_.Command)\" }\n\nSection \"INSTALLED HOTFIXES (last 10)\"\nGet-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 10 |\n    ForEach-Object { Out \"  $($_.HotFixID) — $($_.InstalledOn)\" }\n\nWrite-Host \"`n[+] Audit saved to: $OUT\" -ForegroundColor Green",
+    teach:[
+      ['$Host.UI.RawUI.WindowTitle = "..."','Accesses the PowerShell host\'s UI properties to set the console window title. Useful for identifying long-running admin sessions.'],
+      ['function Section($title) { "=" * 50 }','PowerShell string repetition: "=" * 50 creates 50 equal signs. Functions defined before use. $title is automatically a local variable.'],
+      ['Get-LocalUser | ForEach-Object','Gets local user accounts (replaces old net user). ForEach-Object (alias: %) processes each object in the pipeline. $_ = current object.'],
+      ['"{0,-20} Enabled:{1}" -f $_.Name, $_.Enabled','-f is the format operator. {0} = first value, {1} = second. -20 = left-align in 20-char field. Much better than string concatenation for tables.'],
+      ['Get-NetTCPConnection -State Listen','Gets TCP connections in listening state. Part of the NetTCPConnection cmdlet — more PowerShell-native than parsing netstat output.'],
+      ['@{N="Process";E={(Get-Process -Id $_.OwningProcess).Name}}','Calculated property syntax. N = column name. E = expression (scriptblock {}). Maps the owning PID to a process name. Inline join of two data sources.'],
+      ['Get-CimInstance Win32_StartupCommand','CIM class for startup entries. Covers Run keys, Startup folder, and more. $_.Location tells you WHERE the entry is registered.'],
+    ]
+  },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────
+let activeFilter = 'all';
+let activeId = null;
+
+// ─── HELPERS ──────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(code) {
+  return code.split('\n').map(line => {
+    const t = line.trimStart();
+    if (t.startsWith('#') || t.startsWith('::') || t.startsWith('REM ') || t.match(/^\/\//))
+      return `<span class="c-comment">${esc(line)}</span>`;
+    // Very light syntax hints
+    let h = esc(line);
+    h = h.replace(/\b(if|else|fi|for|do|done|while|case|esac|in|then|function|return|exit|echo|printf|local|declare)\b/g,'<span class="c-keyword">$1</span>');
+    h = h.replace(/\b(Write-Host|Get-|Set-|New-|Remove-|Start-|Stop-|Import-|Export-|Add-|Format-|Select-|Where-|ForEach-|param|function|foreach|if|else|try|catch)\b/g,'<span class="c-keyword">$1</span>');
+    return h;
+  }).join('\n');
+}
+
+const CATS = [...new Set(SCRIPTS.map(s => s.cat))];
+const CAT_COLORS = {
+  'Privacy & Kill Switch':        '#ff4e00',
+  'Network Recon / OSINT':        '#00d4ff',
+  'Incident Response / Forensics':'#ff3b3b',
+  'Intune / MDM Tasks':           '#8fa0f0',
+  'Log Parsing / SIEM Prep':      '#ffb300',
+  'System Administration':        '#00ff88',
+  'Automation / Scheduling':      '#ff8c00',
+};
+
+function osLabel(os) {
+  const map = { bash:'BASH', batch:'BATCH', ps:'PS1', both:'BOTH' };
+  return map[os] || os.toUpperCase();
+}
+
+// ─── FILTER ───────────────────────────────────────────────────────────
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  activeId = null;
+  renderSidebar();
+  renderMain();
+}
+
+function getVisible() {
+  const q = (document.getElementById('search')?.value || '').toLowerCase();
+  return SCRIPTS.filter(s => {
+    const matchOs = activeFilter === 'all' || s.os === activeFilter;
+    const matchQ  = !q || s.title.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q);
+    return matchOs && matchQ;
+  });
+}
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────
+function renderSidebar() {
+  const visible = getVisible();
+  document.getElementById('total-count').textContent   = SCRIPTS.length;
+  document.getElementById('visible-count').textContent = visible.length;
+
+  const sidebar = document.getElementById('sidebar');
+  if (visible.length === 0) {
+    sidebar.innerHTML = '<div style="padding:2rem;color:#4a6a88;font-family:var(--mono);font-size:12px;">// no results</div>';
+    return;
+  }
+
+  let html = '';
+  CATS.forEach(cat => {
+    const items = visible.filter(s => s.cat === cat);
+    if (!items.length) return;
+    const color = CAT_COLORS[cat] || '#ff4e00';
+    html += `<div class="cat-section">
+      <div class="cat-header">
+        <span class="cat-dot" style="background:${color}"></span>
+        ${esc(cat)}
+      </div>`;
+    items.forEach(s => {
+      html += `<div class="script-item ${activeId===s.id?'active':''}" onclick="selectScript('${s.id}')">
+        <span class="item-os os-${s.os}">${osLabel(s.os)}</span>
+        <div class="item-info">
+          <div class="item-title">${esc(s.title)}</div>
+          <div class="item-desc">${esc(s.desc)}</div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  sidebar.innerHTML = html;
+}
+
+// ─── MAIN PANEL ───────────────────────────────────────────────────────
+function selectScript(id) {
+  activeId = activeId === id ? null : id;
+  renderSidebar();
+  renderMain();
+}
+
+function renderMain() {
+  const main = document.getElementById('main');
+  if (!activeId) {
+    main.innerHTML = `<div class="empty-state">
+      <div class="big">DFS</div>
+      <p>// select a script to view code + breakdown</p>
+    </div>`;
+    return;
+  }
+  const s = SCRIPTS.find(x => x.id === activeId);
+  if (!s) return;
+  const color = CAT_COLORS[s.cat] || '#ff4e00';
+
+  main.innerHTML = `<div class="detail-wrap">
+    <div class="detail-head">
+      <div>
+        <div class="detail-meta" style="margin-bottom:8px;">
+          <span class="item-os os-${s.os}">${osLabel(s.os)}</span>
+          <span style="font-family:var(--mono);font-size:11px;color:${color};">${esc(s.cat)}</span>
+        </div>
+        <div class="detail-title">${esc(s.title)}</div>
+        <div class="detail-desc">${esc(s.desc)}</div>
+      </div>
+      <button class="copy-btn" id="copybtn" onclick="copyScript()">Copy Code</button>
+    </div>
+
+    <div class="usecase-bar">
+      <span class="usecase-label">Use&nbsp;Case</span>
+      <span class="usecase-text">${esc(s.usecase)}</span>
+    </div>
+
+    <div class="save-tip">
+      <span>$</span> Save as: <span>${esc(s.saveas)}</span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span>$</span> chmod +x ${esc(s.saveas)}
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-topbar">
+        <div class="code-dots">
+          <span class="d1"></span><span class="d2"></span><span class="d3"></span>
+        </div>
+        <span>${esc(s.saveas)}</span>
+      </div>
+      <pre>${highlight(s.code)}</pre>
+    </div>
+
+    <div class="teach-section">
+      <div class="section-label">Line-by-line breakdown</div>
+      <div class="teach-grid">
+        ${s.teach.map(([cmd, exp]) => `
+          <div class="teach-item">
+            <div class="teach-code" title="${esc(cmd)}">${esc(cmd)}</div>
+            <div class="teach-exp">${esc(exp)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function copyScript() {
+  const s = SCRIPTS.find(x => x.id === activeId);
+  if (!s) return;
+  navigator.clipboard.writeText(s.code).then(() => {
+    const btn = document.getElementById('copybtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy Code'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+renderSidebar();
+renderMain();
+</script>
+</body>
+</html>
